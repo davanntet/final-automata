@@ -18,20 +18,8 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
 
-export default function MultipleSelectCheckmarks() {
+export default function MultipleSelectCheckmarks({names}) {
   const [personName, setPersonName] = React.useState([]);
 
   const handleChange = (event) => {
@@ -45,18 +33,17 @@ export default function MultipleSelectCheckmarks() {
   };
 
   return (
-    <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+    <div className='w-full flex flex-col'>
         <Select
           labelId="demo-multiple-checkbox-label"
           id="demo-multiple-checkbox"
           multiple
           value={personName}
           onChange={handleChange}
-          input={<OutlinedInput label="Tag" />}
+          autoWidth={true}
           renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
+          className='border-0 border-white outline-white outline-0 focus:outline-none focus:border-white'
         >
           {names.map((name) => (
             <MenuItem key={name} value={name}>
@@ -65,7 +52,7 @@ export default function MultipleSelectCheckmarks() {
             </MenuItem>
           ))}
         </Select>
-      </FormControl>
+
     </div>
   );
 }
