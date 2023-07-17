@@ -31,7 +31,7 @@ export default function MultipleSelectCheckmarks({names}) {
       typeof value === 'string' ? value.split(',') : value,
     );
   };
-
+  
   return (
     <div className='w-full flex flex-col'>
         <Select
