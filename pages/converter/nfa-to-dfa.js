@@ -67,10 +67,96 @@ function converter(datas,header,states,startfinal){
     for(let i=0;i<result1.length;i++){
         mergeResult.push(Object.assign(result1[i],result2[i]))
     }
-    console.log(mergeResult)
+    // console.log(mergeResult)
+    minimization(mergeResult,header,oldState)
     
 }
 
+function minimization(result,header,states){
+    //step 1 
+    // console.log(result)
+    result = []
+    states = ['q0','q1','q2','q3','q4','q5','q6','q7']
+    let newState = []
+    let checked = []
+    result.push(Object.fromEntries([['start',true],['final',false],['value','q0'],['a','q1'],['b','q5']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q1'],['a','q6'],['b','q2']]))
+    result.push(Object.fromEntries([['start',false],['final',true],['value','q2'],['a','q0'],['b','q2']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q3'],['a','q2'],['b','q6']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q4'],['a','q7'],['b','q5']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q5'],['a','q2'],['b','q6']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q6'],['a','q6'],['b','q4']]))
+    result.push(Object.fromEntries([['start',false],['final',false],['value','q7'],['a','q6'],['b','q2']]))
+    newState.pop()
+    for(let symbol of header){
+        newState.push(result[0][symbol])
+    }
+    checked.push('q0')
+    newState = newState.filter(e=>e!='q0')
+    while(newState.length>0){
+        const state = newState[0]
+        newState.shift()
+        checked.push(state)
+        const index = states.indexOf(state)
+        for(let symbol of header){
+            try {
+                const value = result[index][symbol]
+                if(!checked.includes(value)){
+                    newState.push(value)
+                } 
+            } catch (error) {
+                console.log("something went wrong")
+            }
+            
+        }
+    }
+    checked = Array.from(new Set(checked))
+    checked.sort()
+
+
+    //step 2
+        //iteration 1
+        let checked1 = [...checked];
+        let checked2 = [...checked];
+        checked2.pop()
+        let newResult1 = checked2.map(e=>{
+            checked1.shift()
+            return [e,Object.fromEntries(
+                checked1.map(ex=>{
+                    return [ex,'']
+                })
+            )]
+        })
+        newResult1 = newResult1.map(e=>{
+            const index = states.indexOf(e[0])
+            const indexData = result[index]
+            if(indexData.final){
+                let e1=Object.entries(e[1])
+                e1 = e1.map(e2=>{
+                    return [e2[0],1]
+                })
+                return [e[0],Object.fromEntries(e1)]
+            }else{
+                let e1=Object.entries(e[1])
+                e1 = e1.map(e2=>{
+                    let subIndex = states.indexOf(e2[0])
+                    if(result[subIndex].final){
+                        return [e2[0],1]
+                    }
+                    return [e2[0],'']
+                })
+               return [e[0],Object.fromEntries(e1)]
+            }
+        })
+        //iteration 2
+        
+        //iteration 3
+
+    // console.log(checked,newState)
+    // console.log(result)
+    console.log(newResult1)
+    
+}
 
 export default function NFAtoDFA(){
     const params = useRouter();
