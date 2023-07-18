@@ -15,7 +15,10 @@ function converter(datas,header,states,startfinal){
     if(datas[0].ε == 'Ø'){
         newPairState.push(['q0'])
     }else{
-        newPairState.push(datas[0].ε.split(','))
+        const ds = datas[0].ε.split(',')
+        ds.push('q0')
+        ds.sort()
+        newPairState.push(ds)
     }
     while(newState.length >0){
         const state = newState[0]
@@ -28,6 +31,10 @@ function converter(datas,header,states,startfinal){
             for(let pair of pairState){
                 let ind = states.indexOf(pair.trim())
                 const inv = datas[ind][symbol]
+                if(inv == 'Ø'){
+                    console.log("Ø is found")
+                    continue
+                }
                 newArr.push(...inv.split(','))
             }
            
@@ -46,9 +53,10 @@ function converter(datas,header,states,startfinal){
             }
             newArr2 = newArr2.map(e=>e.trim())
             newArr2 = Array.from(new Set(newArr2))
+            newArr2.sort()
             const ing = newPairState.findIndex(ex=> JSON.stringify(ex)==JSON.stringify(newArr2))
             if(ing == -1){
-                result.push(Object.fromEntries([['start',state == 'q0'],['final',pairState.includes(startfinal.final)],['value',state],[symbol,'q'+(newPairState.length)]]))
+                result.push(Object.fromEntries([['start',state == 'q0'],['final',state == 'q0'?false:pairState.includes(startfinal.final)],['value',state],[symbol,'q'+(newPairState.length)]]))
                 newState.push('q'+(newPairState.length))
                 oldState.push('q'+(newPairState.length))
                 newPairState.push(newArr2)
@@ -59,34 +67,30 @@ function converter(datas,header,states,startfinal){
         // console.log(pairState)
     }
     
-    // console.log(newPairState)
-    //  console.log(newState,oldState,newPairState)
     const result1 = result.filter((e,idx)=>idx%2==0)
     const result2 = result.filter((e,idx)=>idx%2==1)
     const mergeResult = []
     for(let i=0;i<result1.length;i++){
         mergeResult.push(Object.assign(result1[i],result2[i]))
     }
-    // console.log(mergeResult)
-    minimization(mergeResult,header,oldState)
-    
+    // return mergeResult
+    return {minimization:minimization(mergeResult,header,oldState),pair:newPairState,result}
 }
 
 function minimization(result,header,states){
     //step 1 
     // console.log(result)
-    result = []
-    states = ['q0','q1','q2','q3','q4','q5','q6','q7']
+    // result = []
+    // states = ['q0','q1','q2','q3','q4']
+    // header = ['a','b']
+    // result.push(Object.fromEntries([['start',true],['final',false],['value','q0'],['a','q1'],['b','q3']]))
+    // result.push(Object.fromEntries([['start',false],['final',false],['value','q1'],['a','q2'],['b','q4']]))
+    // result.push(Object.fromEntries([['start',false],['final',false],['value','q2'],['a','q1'],['b','q4']]))
+    // result.push(Object.fromEntries([['start',false],['final',false],['value','q3'],['a','q2'],['b','q4']]))
+    // result.push(Object.fromEntries([['start',false],['final',true],['value','q4'],['a','q4'],['b','q4']]))
+   
     let newState = []
     let checked = []
-    result.push(Object.fromEntries([['start',true],['final',false],['value','q0'],['a','q1'],['b','q5']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q1'],['a','q6'],['b','q2']]))
-    result.push(Object.fromEntries([['start',false],['final',true],['value','q2'],['a','q0'],['b','q2']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q3'],['a','q2'],['b','q6']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q4'],['a','q7'],['b','q5']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q5'],['a','q2'],['b','q6']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q6'],['a','q6'],['b','q4']]))
-    result.push(Object.fromEntries([['start',false],['final',false],['value','q7'],['a','q6'],['b','q2']]))
     newState.pop()
     for(let symbol of header){
         newState.push(result[0][symbol])
@@ -112,7 +116,7 @@ function minimization(result,header,states){
     }
     checked = Array.from(new Set(checked))
     checked.sort()
-
+    // return checked
 
     //step 2
         //iteration 1
@@ -127,6 +131,7 @@ function minimization(result,header,states){
                 })
             )]
         })
+        // return newResult1
         newResult1 = newResult1.map(e=>{
             const index = states.indexOf(e[0])
             const indexData = result[index]
@@ -139,7 +144,7 @@ function minimization(result,header,states){
             }else{
                 let e1=Object.entries(e[1])
                 e1 = e1.map(e2=>{
-                    let subIndex = states.indexOf(e2[0])
+                    let subIndex = states.indexOf(e2[0].trim())
                     if(result[subIndex].final){
                         return [e2[0],1]
                     }
@@ -148,14 +153,141 @@ function minimization(result,header,states){
                return [e[0],Object.fromEntries(e1)]
             }
         })
+        // return newResult1
         //iteration 2
-        
-        //iteration 3
+        newResult1 = newResult1.map(e=>{
+            const index = states.indexOf(e[0])
+            const indexData = result[index]
+            let e1=Object.entries(e[1])
+            e1 = e1.map(e2=>{
+                if(e2[1]==1){
+                    return [e2[0],1]
+                }else{
+                        let sumResult=[]
+                        for(let symbol of header){
 
+                            // console.log(symbol)
+                        const subIndex = states.indexOf(e2[0])
+                        const subIndexData = result[subIndex]
+                        const one = subIndexData[symbol]
+                        const two = indexData[symbol]
+                        const oneIndex = result[states.indexOf(one)]
+                        const twoIndex = result[states.indexOf(two)]
+                        // console.log(symbol,indexData,two,twoIndex.final,subIndexData,one,oneIndex.final)
+                        if(oneIndex.final||twoIndex.final){
+                            if(one!=two){
+                                sumResult=[e2[0],2]
+                                break;
+                            }else{
+                                sumResult = [e2[0],'']
+                            }
+                        }else{
+                            sumResult=[e2[0],'']
+                        }
+                        }
+                     return sumResult;
+
+                }
+            })
+            return [e[0],Object.fromEntries(e1)]
+        })
+        // return newResult1
+        //iteration 3
+        newResult1 = newResult1.map(e=>{
+            const index = states.indexOf(e[0])
+            const indexData = result[index]
+            let e1=Object.entries(e[1])
+            e1 = e1.map(e2=>{
+                if(e2[1]==1){
+                    return [e2[0],1]
+                }else if(e2[1]==2){
+                    return [e2[0],2]
+                }else{
+                        let ans=false
+                        for(let symbol of header){
+                            // console.log(symbol)
+                            const subIndex = states.indexOf(e2[0])
+                            const subIndexData = result[subIndex]
+                            const one = subIndexData[symbol]
+                            const two = indexData[symbol]
+                            if(one!=two){
+                                ans=true
+                            }else if(one==two){
+                                ans=false
+                                break;
+                            }   
+                        }
+                        if(ans){
+                            return [e2[0],3]
+                        }else{
+                            return [e2[0],'']
+                        }
+                }
+            })
+            return [e[0],Object.fromEntries(e1)]
+        })
+        // return newResult1
     // console.log(checked,newState)
     // console.log(result)
-    console.log(newResult1)
-    
+
+    //group the state into equivalence class
+    const newResult2 = [...newResult1]
+    let group = []
+    let already = []
+    for(let e of newResult2){
+        const dt = Object.entries(e[1])
+        const dts=[]
+        if(already.includes(e[0])) continue;
+        dts.push(e[0])
+        already.push(e[0])
+        for(let d of dt){
+            if(d[1]==''){
+                dts.push(d[0])
+                already.push(d[0])
+            }
+        }
+        group.push(dts)
+    }
+    if(!already.includes(checked[checked.length-1])){
+        group.push([checked[checked.length-1]])
+        already.push(checked[checked.length-1])
+    }
+
+    // console.log(group)
+    // console.log(newResult1)
+    // return newResult1;
+    let newResult3 = []
+    for(let e of group){
+        newResult3.push(e[0])
+    }
+    let finalResult = newResult3.map((e,idx)=>{
+        let index = states.indexOf(e)
+        let indexData = result[index]
+        indexData.value = 'q'+idx
+        for(let symbol of header){
+            const subIndexData = indexData[symbol]
+            for(let ex of group){
+                if(ex.includes(subIndexData)){
+                    indexData[symbol] = 'q'+group.indexOf(ex)
+                }
+            }
+        }
+        const subData = group[idx]
+        for(let ed of subData){
+            let ined = states.indexOf(ed)
+            let inedData = result[ined]
+            if(inedData.final){
+                indexData.final = true
+            }
+            if(inedData.start){
+                indexData.start = true
+            }
+        }
+
+        return indexData
+    })
+    // console.log(group)
+    return {result:result,minimize:finalResult,step2:newResult1,class:group,step1:checked,dstep1:states};
 }
 
 export default function NFAtoDFA(){
@@ -184,7 +316,6 @@ export default function NFAtoDFA(){
                 if(index >1){
                     const tran = ob.children[0].children[0].children[0].textContent
                     objData.push([header[index-2],tran])
-                    // console.log(([header[index],tran]))
                 }else if(index==0){
                     objData.push(['is',ob.textContent])
                 }else if(index==1){
@@ -198,7 +329,6 @@ export default function NFAtoDFA(){
         const start = datas.findIndex(e=>e.is=='0')
         const end = datas.findIndex(e=>e.is=='1')
         const twoinone = datas.findIndex(e=>e.is=='2')
-        // console.log(start,end,twoinone)
         let startfinal={}
         if(twoinone == -1){
             startfinal.start = 'q'+start
@@ -208,7 +338,8 @@ export default function NFAtoDFA(){
             startfinal.final = 'q'+twoinone
         }
 
-        converter(datas,header,numState,startfinal)
+        const result = converter(datas,header,numState,startfinal)
+        console.log(result)
     }
     return <>
         <TableDynamic ref={refState} state={data.state} symbol={data.symbol}/>
