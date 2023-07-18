@@ -1,6 +1,7 @@
+import ANSOne from "@/components/Answer/ANSOne";
 import TableDynamic from "@/components/Table/TableDynamic";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 //create a function to convert NFA to DFA using javascript code
 function converter(datas,header,states,startfinal){
@@ -74,7 +75,7 @@ function converter(datas,header,states,startfinal){
         mergeResult.push(Object.assign(result1[i],result2[i]))
     }
     // return mergeResult
-    return {minimization:minimization(mergeResult,header,oldState),pair:newPairState,result}
+    return {minimization:minimization(mergeResult,header,oldState),pair:newPairState,result,state:oldState,header,mergeResult}
 }
 
 function minimization(result,header,states){
@@ -292,6 +293,7 @@ function minimization(result,header,states){
 
 export default function NFAtoDFA(){
     const params = useRouter();
+    const [resultValue,setResultValue]=useState(null)
     const data = params.query
     const refState = useRef(null)
     let datas = []
@@ -339,6 +341,7 @@ export default function NFAtoDFA(){
         }
 
         const result = converter(datas,header,numState,startfinal)
+        setResultValue(result)
         console.log(result)
     }
     return <>
@@ -346,5 +349,6 @@ export default function NFAtoDFA(){
         <div className="w-full flex  justify-center">
             <button className="bg-pink-800 text-center mx-auto px-6 rounded-lg hover:bg-pink-700 py-1 text-white font-bold" onClick={stateHandler}>Convert to DFA</button>
         </div>
+        <ANSOne result={resultValue}/>
     </>
 }    
