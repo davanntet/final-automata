@@ -33,7 +33,6 @@ function converter(datas,header,states,startfinal){
                 let ind = states.indexOf(pair.trim())
                 const inv = datas[ind][symbol]
                 if(inv == 'Ø'){
-                    console.log("Ø is found")
                     continue
                 }
                 newArr.push(...inv.split(','))
@@ -61,19 +60,19 @@ function converter(datas,header,states,startfinal){
                 newState.push('q'+(newPairState.length))
                 oldState.push('q'+(newPairState.length))
                 newPairState.push(newArr2)
+                // console.log('not found',symbol)
             }else{
                 result.push(Object.fromEntries([['start',state == 'q0'],['final',pairState.includes(startfinal.final)],['value',state],[symbol,oldState[ing]]]))
+                // console.log('found',symbol)
             }
+            
         }
         // console.log(pairState)
     }
     
-    const result1 = result.filter((e,idx)=>idx%2==0)
-    const result2 = result.filter((e,idx)=>idx%2==1)
-    const mergeResult = []
-    for(let i=0;i<result1.length;i++){
-        mergeResult.push(Object.assign(result1[i],result2[i]))
-    }
+    const mergeResult = Array.from({length:Math.ceil(result.length/header.length)},(_,index)=>{
+        return Object.assign(...result.slice(index*header.length,(index+1)*header.length))
+    })
     // return mergeResult
     return {minimization:minimization(mergeResult,header,oldState),pair:newPairState,result,state:oldState,header,mergeResult}
 }
@@ -132,27 +131,20 @@ function minimization(result,header,states){
                 })
             )]
         })
-        // return newResult1
+
         newResult1 = newResult1.map(e=>{
             const index = states.indexOf(e[0])
             const indexData = result[index]
-            if(indexData.final){
-                let e1=Object.entries(e[1])
-                e1 = e1.map(e2=>{
-                    return [e2[0],1]
-                })
-                return [e[0],Object.fromEntries(e1)]
-            }else{
-                let e1=Object.entries(e[1])
-                e1 = e1.map(e2=>{
-                    let subIndex = states.indexOf(e2[0].trim())
-                    if(result[subIndex].final){
+            let e1=Object.entries(e[1])
+            e1 = e1.map(e2=>{
+                let subIndex = states.indexOf(e2[0].trim())
+                if(indexData.final!=result[subIndex].final){
                         return [e2[0],1]
-                    }
-                    return [e2[0],'']
-                })
-               return [e[0],Object.fromEntries(e1)]
-            }
+                }else{
+                        return [e2[0],'']
+                }
+            })
+            return [e[0],Object.fromEntries(e1)]
         })
         // return newResult1
         //iteration 2
@@ -291,10 +283,11 @@ function minimization(result,header,states){
     return {result:result,minimize:finalResult,step2:newResult1,class:group,step1:checked,dstep1:states};
 }
 
-export default function NFAtoDFA(){
-    const params = useRouter();
+export default function NFAtoDFA({data}){
+    // const params = useRouter();
+    if(!data) return <></>
     const [resultValue,setResultValue]=useState(null)
-    const data = params.query
+    // const data = params.query
     const refState = useRef(null)
     let datas = []
     let header = []
@@ -347,7 +340,7 @@ export default function NFAtoDFA(){
     return <>
         <TableDynamic ref={refState} state={data.state} symbol={data.symbol}/>
         <div className="w-full flex  justify-center">
-            <button className="bg-pink-800 text-center mx-auto px-6 rounded-lg hover:bg-pink-700 py-1 text-white font-bold" onClick={stateHandler}>Convert to DFA</button>
+            <button className="bg-pink-800 text-center mx-auto px-6 rounded-lg hover:bg-pink-700 py-1 text-white font-bold" onClick={stateHandler}>Convert</button>
         </div>
         <ANSOne result={resultValue}/>
     </>
