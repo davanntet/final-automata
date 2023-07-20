@@ -1,5 +1,6 @@
 import InputInfo from "@/components/input/InputInfo"
-import NFAtoDFA from "./converter/nfa-to-dfa"
+import NFAtoDFA from "@/components/nfa-to-dfa"
+
 import { useState } from "react"
 
 
@@ -9,7 +10,7 @@ export default function Home() {
     setValue({state,symbol})
   }
   return <>
-    <div className="w-full">
+    <div className="w-full relative z-10">
         <div>
           <div className="flex  flex-col w-96  mt-10 mx-auto">
             <h1 className="text-2xl font-bold text-center w-full">Converter NFA to DFA</h1>
