@@ -165,7 +165,14 @@ export default function minimization(result,header,states){
     for(let e of group){
         newResult3.push(e[0])
     }
-    let finalResult = newResult3.map((e,idx)=>{
+    const finalResult = final_result(result,header,group,newResult3,states);
+    
+    // console.log(group)
+    return {result:result,minimize:finalResult,step2:newResult1,class:group,step1:checked,dstep1:states};
+}
+
+function final_result(result,header,group,newResult3,states){
+    const finalResult = newResult3.map((e,idx)=>{
         let index = states.indexOf(e)
         let indexData = result[index]
         indexData.value = 'q'+idx
@@ -188,9 +195,7 @@ export default function minimization(result,header,states){
                 indexData.start = true
             }
         }
-
         return indexData
     })
-    // console.log(group)
-    return {result:result,minimize:finalResult,step2:newResult1,class:group,step1:checked,dstep1:states};
+    return finalResult;
 }
