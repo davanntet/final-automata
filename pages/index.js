@@ -10,10 +10,10 @@ export default function Home() {
     setValue({state,symbol})
   }
   return <>
-    <div className="w-full relative z-10">
+    <div className="w-full relative">
+    
         <div>
           <div className="flex  flex-col w-96  mt-10 mx-auto">
-            <h1 className="text-2xl font-bold text-center w-full">Converter NFA to DFA</h1>
           </div>
           <InputInfo actionData={stateHandler}/>
         </div>
