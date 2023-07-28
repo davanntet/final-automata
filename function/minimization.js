@@ -43,7 +43,7 @@ export default function minimization(result,header,states){
                 })
             )]
         })
-
+        
         newResult1 = newResult1.map(e=>{
             const index = states.indexOf(e[0])
             const indexData = result[index]

@@ -2,10 +2,6 @@ import minimization from "./minimization"
 
 export default function converter(datas,header,states,startfinal){
     header.pop()
-    console.log("Data:",datas)
-    console.log("Header:",header)
-    console.log("States:",states)
-    console.log("Startfinal:",startfinal)
     const result = []
     
     const newState = []
@@ -55,14 +51,17 @@ export default function converter(datas,header,states,startfinal){
             newArr2 = Array.from(new Set(newArr2))
             newArr2.sort()
             const ing = newPairState.findIndex(ex=> JSON.stringify(ex)==JSON.stringify(newArr2))
+            console.log("Pair State: "+pairState)
             if(ing == -1){
-                result.push(Object.fromEntries([['start',state == 'q0'],['final',state == 'q0'?false:pairState.includes(startfinal.final)],['value',state],[symbol,'q'+(newPairState.length)]]))
+                let findFinal = pairState.filter(e=>startfinal.final.includes(e))
+                result.push(Object.fromEntries([['start',state == 'q0'],['final',state == 'q0'?false:findFinal.length==0?false:true],['value',state],[symbol,'q'+(newPairState.length)]]))
                 newState.push('q'+(newPairState.length))
                 oldState.push('q'+(newPairState.length))
                 newPairState.push(newArr2)
                 // console.log('not found',symbol)
             }else{
-                result.push(Object.fromEntries([['start',state == 'q0'],['final',pairState.includes(startfinal.final)],['value',state],[symbol,oldState[ing]]]))
+                let findFinal = pairState.filter(e=>startfinal.final.includes(e))
+                result.push(Object.fromEntries([['start',state == 'q0'],['final',findFinal.length==0?false:true],['value',state],[symbol,oldState[ing]]]))
                 // console.log('found',symbol)
             }
             
