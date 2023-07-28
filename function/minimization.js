@@ -27,7 +27,7 @@ export default function minimization(result,header,states){
         }
     }
     checked = Array.from(new Set(checked))
-    checked.sort()
+    checked.sort((a, b) => parseInt(a.match(/\d+/)) - parseInt(b.match(/\d+/)));
     // return checked
 
     //step 2
@@ -43,7 +43,7 @@ export default function minimization(result,header,states){
                 })
             )]
         })
-        
+
         newResult1 = newResult1.map(e=>{
             const index = states.indexOf(e[0])
             const indexData = result[index]

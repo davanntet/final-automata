@@ -14,7 +14,7 @@ export default function converter(datas,header,states,startfinal){
     }else{
         const ds = datas[0].ε.split(',')
         ds.push('q0')
-        ds.sort()
+        ds.sort((a, b) => parseInt(a.match(/\d+/)) - parseInt(b.match(/\d+/)));
         newPairState.push(ds)
     }
     while(newState.length >0){
@@ -49,7 +49,7 @@ export default function converter(datas,header,states,startfinal){
             }
             newArr2 = newArr2.map(e=>e.trim())
             newArr2 = Array.from(new Set(newArr2))
-            newArr2.sort()
+            newArr2.sort((a, b) => parseInt(a.match(/\d+/)) - parseInt(b.match(/\d+/)));
             const ing = newPairState.findIndex(ex=> JSON.stringify(ex)==JSON.stringify(newArr2))
             console.log("Pair State: "+pairState)
             if(ing == -1){
