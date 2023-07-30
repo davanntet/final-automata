@@ -34,7 +34,7 @@ export default function ANSOne({result}){
             })
             }</div>
         <h1 className="mt-6 text-xl font-bold">Minimization of DFA</h1>
-        <h2 className="mt-6 text-lg font-bold ml-10">Step 1</h2>
+        <h2 className="mt-6 text-lg font-bold ml-10 mb-5">Step 1: <span className="font-semibold ml-1">Remove non accessible states</span></h2>
         <table className="tracking-widest text-lg font-semibold ml-10">
             <tr>
                 {state.map(e=>{
@@ -47,7 +47,7 @@ export default function ANSOne({result}){
                 })}
             </tr>
         </table>
-        <h2 className="mt-6 text-lg font-bold ml-10">Step 2</h2>
+        <h2 className="mt-6 text-lg font-bold ml-10">Step 2: <span className="font-semibold ml-1">Mark the distinguishable pairs of states</span></h2>
         <table className="-rotate-90 ml-10 mt-4">
             <tr>{
                 secondY.map((e,ind)=>{
@@ -69,7 +69,7 @@ export default function ANSOne({result}){
                 })
             }
         </table>
-        <h2 className="mt-6 text-lg font-bold ml-10">Group Class</h2>   
+        <h2 className="mt-6 text-lg font-bold ml-10">Step 3: <span className="font-semibold ml-1">Construct the minimized DFA</span></h2>   
         <div className="ml-14  tracking-widest text-lg font-semibold">
             {
                 groupClass.map((e,ind)=>{

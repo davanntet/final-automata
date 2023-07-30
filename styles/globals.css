@@ -25,3 +25,7 @@
     )
     rgb(var(--background-start-rgb));
 } */
+
+html::-webkit-scrollbar{
+  width: 0;
+}
